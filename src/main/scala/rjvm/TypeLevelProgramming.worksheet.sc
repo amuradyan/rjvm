@@ -186,11 +186,25 @@ object Sort:
   def apply[L <: HList](using sort: Sort[L]): QSort[L, sort.Result] =
     new Sort[L] { type Result = sort.Result }
 
-val s1 = Sort[_4 :: _2 :: _5 :: HNil]
+val s1 = Sort[_4 :: _2 :: _5 :: _1 :: HNil]
 
 import org.tpolecat.typename.TypeName
 
 def printType[A](v: A)(using t: TypeName[A]): Unit =
-  println(t.value)
+  val typeStart = t.value.indexOf("type Result >:")
+  val typeEnd = t.value.lastIndexOf("<:")
+
+  // looks /is/ terrible, helps a lot
+  val typeString =
+    t.value
+      .substring(typeStart + 14, typeEnd)
+      .replaceAll("MdocApp.this", "")
+      .replaceAll(".::\\[.", " :: ")
+      .replaceAll(".HNil\\]\\]\\]\\]", "")
+      .replaceAll(",", "")
+      .replaceAll("._", "")
+      .drop(4)
+
+  println(typeString)
 
 printType(s1)
